@@ -1,6 +1,6 @@
 const PRICE_DECIMALS = 3
 
-function roundPrice(value: number): number {
+export function roundPrice(value: number): number {
   return Number(Number(value).toFixed(PRICE_DECIMALS))
 }
 

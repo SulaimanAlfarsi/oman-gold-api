@@ -15,6 +15,15 @@ function getDurations() {
   return isResponsive ? { fade: 0.8, path: 2.5 } : { fade: 0.5, path: 1.5 }
 }
 
+function setLeaveCompleteState(overlay: HTMLDivElement | null, path: SVGPathElement | null) {
+  if (overlay) gsap.set(overlay, { opacity: 1 })
+  if (path) gsap.set(path, { drawSVG: '100%', strokeWidth: 300 })
+}
+
+function setEnterCompleteState(path: SVGPathElement | null) {
+  if (path) gsap.set(path, { drawSVG: '0%', strokeWidth: 2 })
+}
+
 type TransitionWrapperProps = {
   children: ReactNode
 }
@@ -36,50 +45,74 @@ export default function TransitionWrapper({ children }: TransitionWrapperProps) 
         <TransitionRouter auto
         
         leave={(next)=>{
-            const { fade, path } = getDurations()
-            const tl = gsap.timeline({onComplete: next})
+            const overlay = transitionOverlayRef.current
+            const path = svgPathRef.current
+            if (!overlay || !path) {
+              next()
+              return () => {}
+            }
+            const { fade, path: pathDur } = getDurations()
+            const tl = gsap.timeline({ onComplete: next })
 
-            tl.to(transitionOverlayRef.current,{
+            tl.set(overlay, { pointerEvents: 'auto' }, 0)
+            .to(overlay, {
                 opacity: 1,
                 duration: fade,
-                ease: "power2.inOut",
-            })
-            .to(svgPathRef.current,{
-                drawSVG: "100%",
+                ease: 'power2.inOut',
+            }, 0)
+            .to(path, {
+                drawSVG: '100%',
                 strokeWidth: 300,
-                duration: path,
-                ease: "power2.inOut",
-            },0)
+                duration: pathDur,
+                ease: 'power2.inOut',
+            }, 0)
 
-            return ()=> tl.kill()
+            return () => {
+              tl.kill()
+              setLeaveCompleteState(overlay, path)
+              gsap.set(overlay, { pointerEvents: 'auto' })
+            }
         }}
 
         enter={(next)=>{
-            const { fade, path } = getDurations()
-            const tl = gsap.timeline({ onComplete: next })
-
-            tl.to(svgPathRef.current,{
-                drawSVG: "100% 100%",
-                strokeWidth: 2,
-                duration: path,
-                ease: "power2.inOut",
+            const overlay = transitionOverlayRef.current
+            const path = svgPathRef.current
+            if (!overlay || !path) {
+              next()
+              return () => {}
+            }
+            setLeaveCompleteState(overlay, path)
+            const { fade, path: pathDur } = getDurations()
+            const tl = gsap.timeline({
+              onComplete: () => {
+                setEnterCompleteState(path)
+                gsap.set(overlay, { pointerEvents: 'none' })
+                next()
+              },
             })
-            .to(transitionOverlayRef.current,{
+
+            tl.to(path, {
+                drawSVG: '100% 100%',
+                strokeWidth: 2,
+                duration: pathDur,
+                ease: 'power2.inOut',
+            }, 0)
+            .to(overlay, {
                 opacity: 0,
                 duration: fade,
-                ease: "power2.inOut",
-            }, 1)
-            .set(svgPathRef.current, {
-                drawSVG: "0%",
-                strokeWidth: 2,
-            })
+                ease: 'power2.inOut',
+            }, pathDur)
 
-            return ()=> tl.kill()
+            return () => {
+              tl.kill()
+              setEnterCompleteState(path)
+              gsap.set(overlay, { opacity: 0, pointerEvents: 'none' })
+            }
         }}
         
         >
 
-            <div ref={transitionOverlayRef} className='fixed inset-0 pointer-events-none z-999 flex items-center justify-center opacity-0'>
+            <div ref={transitionOverlayRef} className="fixed inset-0 z-[9999] flex items-center justify-center opacity-0" style={{ pointerEvents: 'none' }} aria-hidden="true">
                 <svg
                     width="100%"
                     height="100%"

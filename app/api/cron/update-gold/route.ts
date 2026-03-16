@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { fetchGoldPrice } from '@/lib/gold-api'
-import { calculateGoldPrices, pricesEqual } from '@/lib/gold-calculations'
+import { fetchGoldPriceOmr } from '@/lib/gold-api'
+import { pricesEqual } from '@/lib/gold-calculations'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function GET(request: Request) {
@@ -11,8 +11,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const apiResponse = await fetchGoldPrice()
-    const prices = calculateGoldPrices(apiResponse.price)
+    const prices = await fetchGoldPriceOmr()
 
     const { data: lastPrice } = await supabaseAdmin
       .from('gold_prices')
@@ -21,14 +20,20 @@ export async function GET(request: Request) {
       .limit(1)
       .single()
 
-    const unchanged =
+    const priceUnchanged =
       lastPrice &&
       pricesEqual(lastPrice.price_24k, prices['24k']) &&
       pricesEqual(lastPrice.price_22k, prices['22k']) &&
       pricesEqual(lastPrice.price_21k, prices['21k']) &&
       pricesEqual(lastPrice.price_18k, prices['18k'])
 
-    if (unchanged) {
+    const lastCreated = lastPrice?.created_at ? new Date(lastPrice.created_at).getTime() : 0
+    const tenMinAgo = Date.now() - 10 * 60 * 1000
+    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000
+    const shouldInsertByTime = lastCreated < tenMinAgo
+    const shouldInsertDaily = lastCreated < oneDayAgo
+
+    if (priceUnchanged && !shouldInsertByTime && !shouldInsertDaily) {
       return NextResponse.json({
         success: true,
         message: 'Price unchanged, skipping insert',

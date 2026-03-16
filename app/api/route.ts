@@ -1,19 +1,14 @@
 import { NextResponse } from 'next/server'
-import { fetchGoldPrice } from '@/lib/gold-api'
-import { calculateGoldPrices } from '@/lib/gold-calculations'
+import { fetchGoldPriceOmr } from '@/lib/gold-api'
 
 export async function GET() {
   try {
-    const goldData = await fetchGoldPrice()
-
-    const ouncePriceUsd = goldData.price
-    const prices = calculateGoldPrices(ouncePriceUsd)
+    const prices = await fetchGoldPriceOmr()
 
     return NextResponse.json({
       success: true,
       currency: 'OMR',
       source: 'goldapi.io',
-      ounce_price_usd: ouncePriceUsd,
       prices,
     })
   } catch (error) {

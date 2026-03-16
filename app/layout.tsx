@@ -1,7 +1,10 @@
-import { Inter_Tight } from 'next/font/google';
+import { Inter_Tight, Geist } from 'next/font/google';
 import './globals.css';
 import Navbar from './components/Navbar';
 import TransitionWrapper from './components/pagetransition/TransitionWrapper';
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const interTight = Inter_Tight({
   variable: '--font-inter-tight',
@@ -15,7 +18,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className={`${interTight.variable} antialiased`}>
         <TransitionWrapper>
           <Navbar />
