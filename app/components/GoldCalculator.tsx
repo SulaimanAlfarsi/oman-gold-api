@@ -13,7 +13,7 @@ const KARATS = [
 function useAnimatedValue(target: number, duration = 450, enabled = true) {
   const [display, setDisplay] = useState(target)
   const prevTarget = useRef(target)
-  const rafRef = useRef<number>()
+  const rafRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (!enabled) {
