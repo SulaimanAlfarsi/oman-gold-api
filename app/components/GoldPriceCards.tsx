@@ -33,7 +33,7 @@ export default function GoldPriceCards() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/gold/latest?live=true')
+    fetch('/api/gold/latest')
       .then((res) => {
         if (!res.ok) throw new Error(`API ${res.status}`)
         return res.json()

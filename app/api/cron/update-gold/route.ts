@@ -1,3 +1,4 @@
+/** Cron: fetches GoldAPI.io (1 call per run). Schedule in vercel.json – e.g. 3x/day keeps under 100 req/month. */
 import { NextResponse } from 'next/server'
 import { fetchGoldPriceOmr } from '@/lib/gold-api'
 import { pricesEqual } from '@/lib/gold-calculations'

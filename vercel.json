@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/update-gold",
-      "schedule": "*/10 * * * *"
+      "schedule": "0 0,8,16 * * *"
     }
   ]
 }
