@@ -1,14 +1,14 @@
-import { Inter_Tight, Geist } from 'next/font/google';
+import { IBM_Plex_Sans } from 'next/font/google';
 import './globals.css';
 import Navbar from './components/Navbar';
 import TransitionWrapper from './components/pagetransition/TransitionWrapper';
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-const interTight = Inter_Tight({
-  variable: '--font-inter-tight',
-  subsets: ['latin'],
+const ibmPlexSans = IBM_Plex_Sans({
+  variable: '--font-ibm-plex-sans',
+  subsets: ['latin', 'latin-ext'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
 });
 
 export const metadata = {
@@ -18,8 +18,8 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
-      <body className={`${interTight.variable} antialiased`}>
+    <html lang="en" className={cn(ibmPlexSans.variable, 'font-sans')}>
+      <body className="antialiased">
         <TransitionWrapper>
           <Navbar />
           {children}
