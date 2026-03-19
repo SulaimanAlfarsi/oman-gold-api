@@ -393,3 +393,4 @@ oman-gold-api/
 | `/api/cron/update-gold` | GET | Scheduled refresh (Vercel Cron) | Yes (1 call per run) |
 
 All examples use the live base URL **https://oman-gold-api.vercel.app**. For local development, use `http://localhost:3000`.
+
