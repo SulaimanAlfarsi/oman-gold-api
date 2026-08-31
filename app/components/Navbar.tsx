@@ -8,6 +8,7 @@ const navItems = [
   { href: '/', label: 'Home' },
   { href: '/prices', label: 'Price per gram' },
   { href: '/calculator', label: 'Calculator' },
+  { href: '/zakat', label: 'Zakat' },
   { href: '/about', label: 'About' },
 ] as const
 
@@ -35,10 +36,6 @@ export default function Navbar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    setOpen(false)
-  }, [pathname])
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

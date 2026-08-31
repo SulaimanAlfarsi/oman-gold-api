@@ -2,6 +2,8 @@
 
 A Next.js 16 App Router application that serves XAU/OMR gold prices per gram for 24k, 22k, 21k, and 18k gold. GoldAPI.io supplies live prices, Supabase stores price history, and public REST endpoints read stored data without spending the external API quota.
 
+The app also includes calculators for gold value and gold zakat. The zakat calculator uses the latest stored 24k OMR price from Supabase by default, lets users override the payment-day price, aggregates multiple holdings, converts karats to pure 24k equivalent weight, and shows both treatments for personally worn daily-use jewelry when selected.
+
 **Live app:** [https://oman-gold-api.vercel.app](https://oman-gold-api.vercel.app)
 
 ## Setup
@@ -62,6 +64,7 @@ The supported namespace is `/api/v1`. All responses are JSON, prices are OMR per
 | `GET /api/v1/gold/latest` | Public | None | Latest stored price row |
 | `GET /api/v1/gold/latest?live=true` | `API_SECRET` | 1 call | Fetch live prices and conditionally store them |
 | `GET /api/v1/gold/calc?grams=&karat=` | Public | None | Calculate a total from the latest stored price |
+| `GET /api/v1/gold/zakat?grams=&karat=` | Public | None | Estimate gold zakat from the latest stored 24k price |
 | `GET /api/v1/gold/history?limit=50&offset=0` | Public | None | Paginated stored history, newest first |
 | `GET /api/v1/gold/update` | `API_SECRET` | 1 call | Manual refresh and conditional insert |
 | `GET /api/v1/cron/update-gold` | `CRON_SECRET` | 1 call | Scheduled refresh |
@@ -117,6 +120,36 @@ curl "https://oman-gold-api.vercel.app/api/v1/gold/calc?grams=5&karat=22k"
 
 `grams` must be a positive number. `karat` accepts `24`, `22`, `21`, or `18`, optionally followed by `k`. Invalid input returns a JSON `400` response.
 
+### Gold zakat
+
+```bash
+curl "https://oman-gold-api.vercel.app/api/v1/gold/zakat?grams=100&karat=21k"
+curl "https://oman-gold-api.vercel.app/api/v1/gold/zakat?items=100:21k,25:22k"
+curl "https://oman-gold-api.vercel.app/api/v1/gold/zakat?items=100:21k:personal,50:24k"
+```
+
+Gold zakat uses the latest stored 24k price only; it never calls GoldAPI.io. The endpoint converts each holding to pure 24k equivalent weight with `weight x karat / 24`, aggregates the pure weight, checks the 85g nisab, and applies the 2.5% zakat rate when nisab is met.
+
+`grams` must be a positive number. `karat` accepts `24`, `22`, `21`, or `18`, optionally followed by `k`. Multiple holdings can be sent with comma-separated `items=grams:karat` values, repeated `items[]`, repeated `holding`, or repeated matching `grams` and `karat` params. Add `:personal` to an item, or `personal_use=true` with a single holding, to mark personally worn daily-use jewelry. When any holding is marked personal use, the response includes both `including_personal_use` and `exempting_personal_use` scenarios because this is a point of scholarly difference.
+
+Example response:
+
+```json
+{
+  "grams": 100,
+  "karat": "21k",
+  "pure_weight_grams": 87.5,
+  "nisab_grams": 85,
+  "nisab_met": true,
+  "price_per_gram_24k": 61.854,
+  "currency": "OMR",
+  "zakat_rate": 0.025,
+  "zakat_grams": 2.188,
+  "zakat_amount": 135.306,
+  "updated_at": "2026-03-16T12:00:00.000Z"
+}
+```
+
 ### History
 
 ```bash
@@ -152,6 +185,7 @@ The unversioned endpoints remain functional as thin aliases and preserve their e
 | `/api` | `/api/v1` |
 | `/api/gold/latest` | `/api/v1/gold/latest` |
 | `/api/gold/calc` | `/api/v1/gold/calc` |
+| `/api/gold/zakat` | `/api/v1/gold/zakat` |
 | `/api/gold/history` | `/api/v1/gold/history` |
 | `/api/gold/update` | `/api/v1/gold/update` |
 | `/api/cron/update-gold` | `/api/v1/cron/update-gold` |
