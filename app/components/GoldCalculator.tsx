@@ -67,7 +67,7 @@ export default function GoldCalculator() {
     const params = new URLSearchParams({ grams: grams.trim(), karat })
     setLoading(true)
     setError(null)
-    fetch(`/api/gold/calc?${params}`)
+    fetch(`/api/v1/gold/calc?${params}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.error) {

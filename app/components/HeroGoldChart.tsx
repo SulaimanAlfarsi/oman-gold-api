@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ResponsiveContainer,
   AreaChart,
@@ -46,6 +46,16 @@ function formatDateAndTime(iso: string) {
 
 const KARATS = ['24k', '22k', '21k', '18k'] as const
 type KaratKey = (typeof KARATS)[number]
+
+const HISTORY_PAGE_SIZE = 500
+const TIME_RANGES = [
+  { key: '7d', label: '7D', days: 7 },
+  { key: '30d', label: '30D', days: 30 },
+  { key: '90d', label: '90D', days: 90 },
+  { key: '1y', label: '1Y', days: 365 },
+  { key: 'all', label: 'All', days: null },
+] as const
+type TimeRangeKey = (typeof TIME_RANGES)[number]['key']
 
 const KARAT_COLORS: Record<KaratKey, string> = {
   '24k': '#B8860B',
@@ -116,27 +126,47 @@ function mergeLatestPoint(points: ChartPoint[], latest: { updated_at: string; pr
   ]
 }
 
+async function fetchAllHistory(): Promise<ChartPoint[]> {
+  const rows: HistoryPoint[] = []
+  let offset = 0
+
+  while (true) {
+    const response = await fetch(
+      `/api/v1/gold/history?limit=${HISTORY_PAGE_SIZE}&offset=${offset}`,
+      { cache: 'no-store' }
+    )
+    if (!response.ok) throw new Error(`History API ${response.status}`)
+
+    const json = await response.json()
+    if (json.success !== true || !Array.isArray(json.data)) {
+      throw new Error('Invalid history response')
+    }
+
+    rows.push(...(json.data as HistoryPoint[]))
+    if (json.data.length < HISTORY_PAGE_SIZE) break
+    offset += json.data.length
+  }
+
+  return buildChartPoints({ success: true, data: rows })
+}
+
 export default function HeroGoldChart() {
   const [data, setData] = useState<ChartPoint[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedKarat, setSelectedKarat] = useState<KaratKey>('24k')
+  const [selectedRange, setSelectedRange] = useState<TimeRangeKey>('all')
 
   useEffect(() => {
     let cancelled = false
 
     function load() {
       Promise.all([
-        fetch('/api/gold/history', { cache: 'no-store' }),
-        fetch('/api/gold/latest', { cache: 'no-store' }),
+        fetchAllHistory(),
+        fetch('/api/v1/gold/latest', { cache: 'no-store' }),
       ])
-        .then(async ([historyRes, latestRes]) => {
-          if (!historyRes.ok) throw new Error(`History API ${historyRes.status}`)
-          const json = await historyRes.json()
-          if (json.success !== true || !Array.isArray(json.data)) {
-            throw new Error('Invalid response')
-          }
-          let points = buildChartPoints(json)
+        .then(async ([historyPoints, latestRes]) => {
+          let points = historyPoints
           if (latestRes.ok) {
             const latestJson = await latestRes.json()
             if (!latestJson?.error && latestJson?.updated_at && latestJson?.prices) {
@@ -175,6 +205,15 @@ export default function HeroGoldChart() {
     }
   }, [])
 
+  const visibleData = useMemo(() => {
+    const range = TIME_RANGES.find((item) => item.key === selectedRange)
+    if (!range?.days || data.length === 0) return data
+
+    const latestTime = data[data.length - 1].time
+    const startTime = latestTime - range.days * 24 * 60 * 60 * 1000
+    return data.filter((point) => point.time >= startTime)
+  }, [data, selectedRange])
+
   if (loading) {
     return (
       <div className="w-full h-[140px] sm:h-[180px] md:h-[220px] mx-auto flex items-center justify-center mt-4 sm:mt-6">
@@ -199,14 +238,14 @@ export default function HeroGoldChart() {
           Chart will appear after at least 2 price updates are saved.
         </p>
         <p className="text-xs text-[#888] mt-1">
-          Call <code className="bg-black/5 px-1 rounded">/api/gold/update</code> or run the cron to add history.
+          No stored price history is available yet.
         </p>
       </div>
     )
   }
 
   const latest = data[data.length - 1]
-  const selectedValues = data.map((d) => d[selectedKarat]).filter((v) => Number.isFinite(v) && v > 0)
+  const selectedValues = visibleData.map((d) => d[selectedKarat]).filter((v) => Number.isFinite(v) && v > 0)
   const yMin = selectedValues.length ? Math.min(...selectedValues) : 0
   const yMax = selectedValues.length ? Math.max(...selectedValues) : 0
   const ySpan = yMax - yMin
@@ -219,18 +258,11 @@ export default function HeroGoldChart() {
   }
   const yDomain: [number, number] = [yLow, yHigh]
 
-  const xDomainPad = (domain: readonly [number, number]): [number, number] => {
-    const [dataMin, dataMax] = domain
-    const span = dataMax - dataMin
-    const pad = span > 0 ? Math.max(span * 0.025, 45_000) : 3_600_000
-    return [dataMin - pad, dataMax + pad]
-  }
-
   const strokeColor = KARAT_COLORS[selectedKarat]
   const gradientId = `hero-gold-area-${selectedKarat}`
 
   return (
-    <div className="w-full mx-auto mt-4 sm:mt-5 md:mt-6 px-0">
+    <div className="mx-auto mt-4 min-w-0 w-full overflow-hidden px-0 sm:mt-5 md:mt-6">
       <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 mb-2 sm:mb-2.5">
         {KARATS.map((k) => (
           <button
@@ -248,8 +280,25 @@ export default function HeroGoldChart() {
           </button>
         ))}
       </div>
+      <div className="flex flex-wrap items-center justify-center gap-1 mb-2 sm:mb-2.5" aria-label="Chart time range">
+        {TIME_RANGES.map((range) => (
+          <button
+            key={range.key}
+            type="button"
+            aria-pressed={selectedRange === range.key}
+            onClick={() => setSelectedRange(range.key)}
+            className={`min-w-10 rounded-md border px-2 py-1 text-xs font-medium transition-colors ${
+              selectedRange === range.key
+                ? 'border-[#1a1a1a] bg-[#1a1a1a] text-white'
+                : 'border-black/10 bg-white/55 text-[#5c5c5c] hover:border-black/25'
+            }`}
+          >
+            {range.label}
+          </button>
+        ))}
+      </div>
       {latest && (
-        <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-3 md:gap-x-4 gap-y-0.5 mb-2 sm:mb-2.5 text-xs sm:text-sm text-[#5c5c5c]">
+        <div className="flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-0.5 mb-2 text-xs text-[#5c5c5c] sm:mb-2.5 sm:gap-x-3 sm:text-sm md:gap-x-4">
           <span className="font-medium text-[#1a1a1a]">Latest per gram:</span>
           <span><span className="font-medium" style={{ color: KARAT_COLORS['24k'] }}>24k</span> {latest['24k'].toFixed(3)}</span>
           <span><span className="font-medium" style={{ color: KARAT_COLORS['22k'] }}>22k</span> {latest['22k'].toFixed(3)}</span>
@@ -258,9 +307,12 @@ export default function HeroGoldChart() {
           <span className="text-[#888]">OMR</span>
         </div>
       )}
-      <div className="h-[168px] min-[400px]:h-[192px] sm:h-[216px] md:h-[248px] lg:h-[276px] rounded-2xl border border-[#e8e2da] bg-white/[0.72] shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(184,134,11,0.06)] backdrop-blur-sm px-1.5 py-2 sm:px-2 sm:py-2.5">
+      <div className="mb-2 text-center text-[11px] text-[#777] sm:text-xs">
+        Showing {visibleData.length.toLocaleString()} of {data.length.toLocaleString()} saved records
+      </div>
+      <div className="h-[168px] w-full min-w-0 overflow-hidden rounded-lg border border-[#e8e2da] bg-white/[0.72] px-1.5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(184,134,11,0.06)] backdrop-blur-sm min-[400px]:h-[192px] sm:h-[216px] sm:px-2 sm:py-2.5 md:h-[248px] lg:h-[276px]">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 8, left: 2, bottom: 4 }}>
+          <AreaChart data={visibleData} margin={{ top: 10, right: 8, left: 2, bottom: 4 }}>
             <defs>
               <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={strokeColor} stopOpacity={0.42} />
@@ -272,7 +324,7 @@ export default function HeroGoldChart() {
             <XAxis
               type="number"
               dataKey="time"
-              domain={xDomainPad}
+              domain={['dataMin', 'dataMax']}
               tick={{ fontSize: 9, fill: '#6b6560' }}
               axisLine={{ stroke: '#e0d9d0' }}
               tickLine={false}
@@ -329,7 +381,7 @@ export default function HeroGoldChart() {
                   payload?: ChartPoint
                 }
                 if (
-                  index !== data.length - 1 ||
+                  index !== visibleData.length - 1 ||
                   cx == null ||
                   cy == null ||
                   !payload ||

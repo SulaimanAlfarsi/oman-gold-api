@@ -33,7 +33,7 @@ export default function GoldPriceCards() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('/api/gold/latest')
+    fetch('/api/v1/gold/latest')
       .then((res) => {
         if (!res.ok) throw new Error(`API ${res.status}`)
         return res.json()
@@ -78,7 +78,7 @@ export default function GoldPriceCards() {
         <div className="rounded-3xl border-2 border-amber-200 bg-amber-50/50 p-8 text-center">
           <p className="text-muted-foreground">{error ?? 'No price data available.'}</p>
           <p className="text-sm text-muted-foreground mt-2">
-            Run <code className="bg-black/5 px-1.5 py-0.5 rounded">/api/gold/update</code> to store the latest price.
+            No stored gold price is available yet.
           </p>
         </div>
       </section>
