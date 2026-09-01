@@ -51,6 +51,12 @@ body {
   font-family: var(--font-ibm-plex-sans), sans-serif;
 }
 
+/* Use the Arabic font family whenever the document is in Arabic / RTL. */
+html[dir='rtl'] body,
+html[lang='ar'] body {
+  font-family: var(--font-ibm-plex-sans-arabic), var(--font-ibm-plex-sans), sans-serif;
+}
+
 /* Animated SVG path draw effect */
 .gold-path {
   stroke-dasharray: 1200;
@@ -250,6 +256,50 @@ body {
   color: #6a5420;
 }
 
+.sterling-nav-root .nav-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  height: 2.6rem;
+  border: 1px solid rgba(232, 228, 223, 0.95);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 12px 30px rgba(19, 19, 19, 0.08);
+  backdrop-filter: blur(12px);
+  padding: 0 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #6a5420;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sterling-nav-root .nav-lang-btn:hover {
+  background: #fff;
+  color: #131313;
+}
+
+.sterling-nav-root .nav-lang-icon {
+  display: block;
+  width: 1.05rem;
+  height: 1.05rem;
+  flex-shrink: 0;
+}
+
+.sterling-nav-root .nav-lang-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Keep Latin/Arabic glyphs on a consistent baseline regardless of page dir */
+  font-family: var(--font-ibm-plex-sans), var(--font-ibm-plex-sans-arabic), sans-serif;
+  line-height: 1;
+  min-width: 1.3rem;
+  padding-inline: 0.15rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 .sterling-nav-root .nav-close-btn {
   display: inline-flex;
   align-items: center;
@@ -260,7 +310,10 @@ body {
   background: #131313;
   color: #fff;
   box-shadow: 0 18px 36px rgba(19, 19, 19, 0.16);
-  padding: 0.28rem 0.36rem 0.28rem 0.86rem;
+  /* Logical padding so the icon circle stays tight to the edge in RTL too */
+  padding-block: 0.28rem;
+  padding-inline-start: 0.86rem;
+  padding-inline-end: 0.36rem;
   cursor: pointer;
 }
 
@@ -460,7 +513,7 @@ body {
 
   .sterling-nav-root .nav-close-btn {
     height: 2.45rem;
-    padding-left: 0.74rem;
+    padding-inline-start: 0.74rem;
   }
 
   .sterling-nav-root .menu-button-text {

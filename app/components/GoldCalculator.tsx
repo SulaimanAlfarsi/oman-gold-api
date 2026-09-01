@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react'
 import BoldSvg from './BoldSvg'
+import { useI18n } from '@/lib/i18n/LanguageProvider'
 
 const KARATS = [
-  { value: '24k', label: '24 Karat' },
-  { value: '22k', label: '22 Karat' },
-  { value: '21k', label: '21 Karat' },
-  { value: '18k', label: '18 Karat' },
+  { value: '24k', labelKey: 'calculator.karat24' },
+  { value: '22k', labelKey: 'calculator.karat22' },
+  { value: '21k', labelKey: 'calculator.karat21' },
+  { value: '18k', labelKey: 'calculator.karat18' },
 ] as const
 
 function useAnimatedValue(target: number, duration = 450, enabled = true) {
@@ -44,6 +45,7 @@ function useAnimatedValue(target: number, duration = 450, enabled = true) {
 }
 
 export default function GoldCalculator() {
+  const { t } = useI18n()
   const [grams, setGrams] = useState('10')
   const [karat, setKarat] = useState('22k')
   const [total, setTotal] = useState<number>(0)
@@ -81,7 +83,7 @@ export default function GoldCalculator() {
         setHasFetched(true)
       })
       .catch(() => {
-        setError('Failed to calculate')
+        setError(t('calculator.failed'))
         setTotal(0)
         setPricePerGram(0)
       })
@@ -92,10 +94,10 @@ export default function GoldCalculator() {
     <section className="w-full max-w-2xl mx-auto">
       <div className="text-center mb-8">
         <h2 className="text-2xl sm:text-3xl font-semibold text-[#1a1a1a] tracking-tight">
-          Calculate value
+          {t('calculator.title')}
         </h2>
         <p className="text-[#5c5c5c] text-sm mt-2">
-          Based on latest gold price per gram
+          {t('calculator.subtitle')}
         </p>
       </div>
 
@@ -105,7 +107,7 @@ export default function GoldCalculator() {
           <div className="grid sm:grid-cols-2 gap-6">
             <div>
               <label htmlFor="calc-grams" className="block text-sm font-medium text-[#1a1a1a] mb-2">
-                Weight (grams)
+                {t('calculator.weight')}
               </label>
               <input
                 id="calc-grams"
@@ -115,12 +117,12 @@ export default function GoldCalculator() {
                 value={grams}
                 onChange={(e) => setGrams(e.target.value)}
                 className="w-full px-4 py-3.5 rounded-xl border border-[#e8e4df] bg-[#F0EBE6]/40 text-[#1a1a1a] placeholder:text-[#888] focus:outline-none focus:ring-2 focus:ring-[#F5BE27]/50 focus:border-[#F5BE27] transition-all"
-                placeholder="e.g. 10"
+                placeholder={t('calculator.weightPlaceholder')}
               />
             </div>
             <div>
               <label htmlFor="calc-karat" className="block text-sm font-medium text-[#1a1a1a] mb-2">
-                Karat
+                {t('calculator.karat')}
               </label>
               <select
                 id="calc-karat"
@@ -131,7 +133,7 @@ export default function GoldCalculator() {
               >
                 {KARATS.map((k) => (
                   <option key={k.value} value={k.value}>
-                    {k.label}
+                    {t(k.labelKey)}
                   </option>
                 ))}
               </select>
@@ -142,7 +144,7 @@ export default function GoldCalculator() {
             {error && (
               <p className="text-sm text-red-600 mb-3">{error}</p>
             )}
-            <p className="text-sm text-[#5c5c5c] mb-1">Estimated value</p>
+            <p className="text-sm text-[#5c5c5c] mb-1">{t('calculator.estimatedValue')}</p>
             <div className="flex items-baseline justify-between flex-wrap gap-2">
               <div className="flex items-baseline gap-2 min-h-[3rem]">
                 {loading ? (
@@ -163,7 +165,7 @@ export default function GoldCalculator() {
               </div>
               {pricePerGram > 0 && (
                 <p className="text-xs text-[#888]">
-                  {pricePerGram.toFixed(3)} per gram
+                  {pricePerGram.toFixed(3)} {t('calculator.perGram')}
                 </p>
               )}
             </div>

@@ -11,6 +11,7 @@ import {
   Legend,
   CartesianGrid,
 } from 'recharts'
+import { useI18n } from '@/lib/i18n/LanguageProvider'
 
 type HistoryPoint = {
   id?: number
@@ -151,6 +152,7 @@ async function fetchAllHistory(): Promise<ChartPoint[]> {
 }
 
 export default function HeroGoldChart() {
+  const { t } = useI18n()
   const [data, setData] = useState<ChartPoint[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -225,7 +227,7 @@ export default function HeroGoldChart() {
   if (error) {
     return (
       <div className="w-full mx-auto mt-4 sm:mt-6 px-3 py-4 sm:px-4 sm:py-6 rounded-xl bg-white/60 border border-amber-200 text-center">
-        <p className="text-sm text-[#5c5c5c]">Could not load chart</p>
+        <p className="text-sm text-[#5c5c5c]">{t('home.couldNotLoadChart')}</p>
         <p className="text-xs text-[#888] mt-1">{error}</p>
       </div>
     )
@@ -235,10 +237,10 @@ export default function HeroGoldChart() {
     return (
       <div className="w-full mx-auto mt-4 sm:mt-6 px-3 py-4 sm:px-4 sm:py-6 rounded-xl bg-white/60 border border-amber-200 text-center">
         <p className="text-sm text-[#5c5c5c]">
-          Chart will appear after at least 2 price updates are saved.
+          {t('home.chartNeedsData')}
         </p>
         <p className="text-xs text-[#888] mt-1">
-          No stored price history is available yet.
+          {t('home.noHistory')}
         </p>
       </div>
     )
@@ -280,7 +282,7 @@ export default function HeroGoldChart() {
           </button>
         ))}
       </div>
-      <div className="flex flex-wrap items-center justify-center gap-1 mb-2 sm:mb-2.5" aria-label="Chart time range">
+      <div className="flex flex-wrap items-center justify-center gap-1 mb-2 sm:mb-2.5" aria-label={t('home.chartTimeRange')}>
         {TIME_RANGES.map((range) => (
           <button
             key={range.key}
@@ -299,16 +301,16 @@ export default function HeroGoldChart() {
       </div>
       {latest && (
         <div className="flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-0.5 mb-2 text-xs text-[#5c5c5c] sm:mb-2.5 sm:gap-x-3 sm:text-sm md:gap-x-4">
-          <span className="font-medium text-[#1a1a1a]">Latest per gram:</span>
+          <span className="font-medium text-[#1a1a1a]">{t('home.latestPerGram')}</span>
           <span><span className="font-medium" style={{ color: KARAT_COLORS['24k'] }}>24k</span> {latest['24k'].toFixed(3)}</span>
           <span><span className="font-medium" style={{ color: KARAT_COLORS['22k'] }}>22k</span> {latest['22k'].toFixed(3)}</span>
           <span><span className="font-medium" style={{ color: KARAT_COLORS['21k'] }}>21k</span> {latest['21k'].toFixed(3)}</span>
           <span><span className="font-medium" style={{ color: KARAT_COLORS['18k'] }}>18k</span> {latest['18k'].toFixed(3)}</span>
-          <span className="text-[#888]">OMR</span>
+          <span className="text-[#888]">{t('common.omr')}</span>
         </div>
       )}
       <div className="mb-2 text-center text-[11px] text-[#777] sm:text-xs">
-        Showing {visibleData.length.toLocaleString()} of {data.length.toLocaleString()} saved records
+        {t('home.showingRecords', { shown: visibleData.length.toLocaleString(), total: data.length.toLocaleString() })}
       </div>
       <div className="h-[168px] w-full min-w-0 overflow-hidden rounded-lg border border-[#e8e2da] bg-white/[0.72] px-1.5 py-2 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_rgba(184,134,11,0.06)] backdrop-blur-sm min-[400px]:h-[192px] sm:h-[216px] sm:px-2 sm:py-2.5 md:h-[248px] lg:h-[276px]">
         <ResponsiveContainer width="100%" height="100%">
@@ -356,7 +358,7 @@ export default function HeroGoldChart() {
                   ? formatDateAndTime((payload[0].payload as ChartPoint).date)
                   : ''
               }
-              formatter={(value: unknown, name: unknown) => [`${Number(value ?? 0).toFixed(3)} OMR`, String(name ?? '')]}
+              formatter={(value: unknown, name: unknown) => [`${Number(value ?? 0).toFixed(3)} ${t('common.omr')}`, String(name ?? '')]}
             />
             <Legend
               wrapperStyle={{ fontSize: '11px', paddingTop: 4 }}
