@@ -1,3 +1,5 @@
+'use client'
+
 import GoldPriceCards from '../components/GoldPriceCards'
 import BoldSvg from '../components/BoldSvg'
 import {
@@ -7,8 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { useI18n } from '@/lib/i18n/LanguageProvider'
 
 export default function PricesPage() {
+  const { t } = useI18n()
   return (
     <main className="min-h-screen bg-[#F0EBE6] pt-24 sm:pt-28 pb-20 px-4 sm:px-6">
       <div className="w-full max-w-5xl mx-auto space-y-12">
@@ -20,15 +24,15 @@ export default function PricesPage() {
               <BoldSvg className="w-32 sm:w-40 h-auto" fill="#F5BE27" />
             </div>
             <CardTitle className="text-2xl sm:text-3xl font-semibold text-[#1a1a1a]">
-              Price per gram
+              {t('prices.title')}
             </CardTitle>
             <CardDescription className="text-base text-muted-foreground">
-              Live gold rates in OMR · 24k, 22k, 21k & 18k
+              {t('prices.description')}
             </CardDescription>
           </CardHeader>
           <CardContent className="pb-8 pt-0 text-center">
             <p className="text-sm text-muted-foreground">
-              Data from goldapi.io · Stored in database when price changes
+              {t('prices.dataNote')}
             </p>
           </CardContent>
         </Card>

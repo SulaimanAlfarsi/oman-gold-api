@@ -51,6 +51,12 @@ body {
   font-family: var(--font-ibm-plex-sans), sans-serif;
 }
 
+/* Use the Arabic font family whenever the document is in Arabic / RTL. */
+html[dir='rtl'] body,
+html[lang='ar'] body {
+  font-family: var(--font-ibm-plex-sans-arabic), var(--font-ibm-plex-sans), sans-serif;
+}
+
 /* Animated SVG path draw effect */
 .gold-path {
   stroke-dasharray: 1200;
@@ -248,6 +254,43 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   color: #6a5420;
+}
+
+.sterling-nav-root .nav-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  height: 2.6rem;
+  border: 1px solid rgba(232, 228, 223, 0.95);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 12px 30px rgba(19, 19, 19, 0.08);
+  backdrop-filter: blur(12px);
+  padding: 0 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #6a5420;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sterling-nav-root .nav-lang-btn:hover {
+  background: #fff;
+  color: #131313;
+}
+
+.sterling-nav-root .nav-lang-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.sterling-nav-root .nav-lang-code {
+  line-height: 1;
+  min-width: 1.3rem;
+  padding-inline: 0.15rem;
+  font-size: 0.95rem;
+  text-align: center;
 }
 
 .sterling-nav-root .nav-close-btn {

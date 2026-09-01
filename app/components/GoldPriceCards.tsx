@@ -12,12 +12,13 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 import BoldSvg from './BoldSvg'
+import { useI18n } from '@/lib/i18n/LanguageProvider'
 
 const KARATS = [
-  { key: '24k' as const, label: '24 Karat', purity: '99.9% gold' },
-  { key: '22k' as const, label: '22 Karat', purity: '91.6% gold' },
-  { key: '21k' as const, label: '21 Karat', purity: '87.5% gold' },
-  { key: '18k' as const, label: '18 Karat', purity: '75% gold' },
+  { key: '24k' as const, purityKey: 'prices.purity24' },
+  { key: '22k' as const, purityKey: 'prices.purity22' },
+  { key: '21k' as const, purityKey: 'prices.purity21' },
+  { key: '18k' as const, purityKey: 'prices.purity18' },
 ]
 
 type LatestPrices = {
@@ -28,6 +29,7 @@ type LatestPrices = {
 } | null
 
 export default function GoldPriceCards() {
+  const { t } = useI18n()
   const [data, setData] = useState<LatestPrices>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -76,9 +78,9 @@ export default function GoldPriceCards() {
     return (
       <section className="w-full max-w-5xl mx-auto">
         <div className="rounded-3xl border-2 border-amber-200 bg-amber-50/50 p-8 text-center">
-          <p className="text-muted-foreground">{error ?? 'No price data available.'}</p>
+          <p className="text-muted-foreground">{error ?? t('prices.noData')}</p>
           <p className="text-sm text-muted-foreground mt-2">
-            No stored gold price is available yet.
+            {t('prices.noStored')}
           </p>
         </div>
       </section>
@@ -88,8 +90,9 @@ export default function GoldPriceCards() {
   return (
     <section className="w-full max-w-5xl mx-auto">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {KARATS.map(({ key, label, purity }) => {
+        {KARATS.map(({ key, purityKey }) => {
           const price = data.prices[key] ?? 0
+          const purity = t(purityKey)
           return (
             <Card
               key={key}
@@ -126,7 +129,7 @@ export default function GoldPriceCards() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-8 pt-0">
-                <p className="text-sm text-muted-foreground">Per gram</p>
+                <p className="text-sm text-muted-foreground">{t('prices.perGram')}</p>
               </CardContent>
             </Card>
           )
@@ -134,7 +137,7 @@ export default function GoldPriceCards() {
       </div>
       {data.updated_at && (
         <p className="text-xs text-muted-foreground mt-6 text-center">
-          Updated {new Date(data.updated_at).toLocaleString()}
+          {t('prices.updated')} {new Date(data.updated_at).toLocaleString()}
         </p>
       )}
     </section>

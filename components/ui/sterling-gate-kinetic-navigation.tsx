@@ -5,17 +5,19 @@ import gsap from 'gsap'
 import { CustomEase } from 'gsap/CustomEase'
 import { Link } from 'next-transition-router'
 import { usePathname } from 'next/navigation'
+import { LuLanguages } from 'react-icons/lu'
+import { useI18n } from '@/lib/i18n/LanguageProvider'
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(CustomEase)
 }
 
-const navItems = [
-  { href: '/', label: 'Home', kicker: 'Latest overview' },
-  { href: '/prices', label: 'Price per gram', kicker: '24k, 22k, 21k, 18k' },
-  { href: '/calculator', label: 'Calculator', kicker: 'Gold value in OMR' },
-  { href: '/zakat', label: 'Zakat', kicker: 'Gold zakat estimate' },
-  { href: '/about', label: 'About', kicker: 'Project details' },
+const navItemKeys = [
+  { href: '/', label: 'nav.home', kicker: 'nav.homeKicker' },
+  { href: '/prices', label: 'nav.prices', kicker: 'nav.pricesKicker' },
+  { href: '/calculator', label: 'nav.calculator', kicker: 'nav.calculatorKicker' },
+  { href: '/zakat', label: 'nav.zakat', kicker: 'nav.zakatKicker' },
+  { href: '/about', label: 'nav.about', kicker: 'nav.aboutKicker' },
 ] as const
 
 export function SterlingGateKineticNavigation() {
@@ -23,6 +25,12 @@ export function SterlingGateKineticNavigation() {
   const hasMountedRef = useRef(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const pathname = usePathname()
+  const { t, locale, toggleLocale } = useI18n()
+  const navItems = navItemKeys.map((item) => ({
+    href: item.href,
+    label: t(item.label),
+    kicker: t(item.kicker),
+  }))
 
   useEffect(() => {
     if (!containerRef.current) return
@@ -191,15 +199,22 @@ export function SterlingGateKineticNavigation() {
       <div className="site-header-wrapper">
         <header className="header">
           <div className="container is--full">
-            <nav className="nav-row" aria-label="Main navigation">
-              <Link href="/" aria-label="Oman Gold API home" className="nav-logo-row">
+            <nav className="nav-row" aria-label={t('nav.mainNav')}>
+              <Link href="/" aria-label={t('nav.brand')} className="nav-logo-row">
                 <span className="nav-logo-mark" aria-hidden />
-                <span className="nav-logo-text">Oman Gold API</span>
+                <span className="nav-logo-text">{t('nav.brand')}</span>
               </Link>
               <div className="nav-row__right">
-                <div className="nav-toggle-label" onClick={() => setIsMenuOpen((value) => !value)}>
-                  <span className="toggle-text">click me</span>
-                </div>
+                <button
+                  type="button"
+                  className="nav-lang-btn"
+                  onClick={toggleLocale}
+                  aria-label={t('nav.language')}
+                  title={locale === 'en' ? t('nav.switchToArabic') : t('nav.switchToEnglish')}
+                >
+                  <LuLanguages className="nav-lang-icon" aria-hidden />
+                  <span className="nav-lang-code">{locale === 'en' ? 'ع' : 'EN'}</span>
+                </button>
 
                 <button
                   type="button"
@@ -207,11 +222,11 @@ export function SterlingGateKineticNavigation() {
                   onClick={() => setIsMenuOpen((value) => !value)}
                   aria-expanded={isMenuOpen}
                   aria-controls="kinetic-menu"
-                  aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+                  aria-label={isMenuOpen ? t('nav.close') : t('nav.menu')}
                 >
                   <div className="menu-button-text" aria-hidden>
-                    <p className="p-large">Menu</p>
-                    <p className="p-large">Close</p>
+                    <p className="p-large">{t('nav.menu')}</p>
+                    <p className="p-large">{t('nav.close')}</p>
                   </div>
                   <div className="icon-wrap" aria-hidden>
                     <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 16 16" fill="none" className="menu-button-icon">
@@ -233,7 +248,7 @@ export function SterlingGateKineticNavigation() {
       <section className="fullscreen-menu-container" id="kinetic-menu">
         <div data-nav="closed" className="nav-overlay-wrapper">
           <div className="overlay" onClick={closeMenu} />
-          <nav className="menu-content" aria-label="Expanded navigation">
+          <nav className="menu-content" aria-label={t('nav.expandedNav')}>
             <div className="menu-bg">
               <div className="backdrop-layer first" />
               <div className="backdrop-layer second" />
