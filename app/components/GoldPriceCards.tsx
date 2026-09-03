@@ -1,16 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { AiFillGold } from 'react-icons/ai'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { cn } from '@/lib/utils'
+import { LuCoins } from 'react-icons/lu'
 import BoldSvg from './BoldSvg'
 import { useI18n } from '@/lib/i18n/LanguageProvider'
 
@@ -60,86 +51,83 @@ export default function GoldPriceCards() {
 
   if (loading) {
     return (
-      <section className="w-full max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {KARATS.map(({ key }) => (
-            <Card key={key} className="rounded-3xl border border-border bg-card p-8 animate-pulse">
-              <div className="h-16 w-16 rounded-full bg-muted mb-6" />
-              <div className="h-4 w-20 bg-muted rounded mb-4" />
-              <div className="h-8 w-28 bg-muted rounded" />
-            </Card>
-          ))}
-        </div>
-      </section>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {KARATS.map(({ key }) => (
+          <div key={key} className="animate-pulse overflow-hidden rounded-2xl border border-[#e8e4df] bg-white">
+            <div className="h-1.5 bg-[#eee6d5]" />
+            <div className="p-6">
+              <div className="mb-6 h-6 w-16 rounded-full bg-[#efe8dc]" />
+              <div className="h-9 w-28 rounded bg-[#efe8dc]" />
+              <div className="mt-4 h-3 w-20 rounded bg-[#efe8dc]" />
+            </div>
+          </div>
+        ))}
+      </div>
     )
   }
 
   if (error || !data) {
     return (
-      <section className="w-full max-w-5xl mx-auto">
-        <div className="rounded-3xl border-2 border-amber-200 bg-amber-50/50 p-8 text-center">
-          <p className="text-muted-foreground">{error ?? t('prices.noData')}</p>
-          <p className="text-sm text-muted-foreground mt-2">
-            {t('prices.noStored')}
-          </p>
-        </div>
-      </section>
+      <div className="rounded-2xl border-2 border-amber-200 bg-amber-50/50 p-8 text-center">
+        <p className="text-[#5c5c5c]">{error ?? t('prices.noData')}</p>
+        <p className="mt-2 text-sm text-[#8a8178]">{t('prices.noStored')}</p>
+      </div>
     )
   }
 
   return (
-    <section className="w-full max-w-5xl mx-auto">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {KARATS.map(({ key, purityKey }) => {
           const price = data.prices[key] ?? 0
-          const purity = t(purityKey)
+          const featured = key === '24k'
           return (
-            <Card
+            <div
               key={key}
-              style={{ ['--accent-color']: '#F5BE27' } as React.CSSProperties}
-              className={cn(
-                'rounded-3xl overflow-hidden border-2 border-border transition-all duration-300',
-                'hover:scale-[1.02] hover:shadow-xl hover:border-[#F5BE27]/50'
-              )}
+              className={`group overflow-hidden rounded-2xl border shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
+                featured
+                  ? 'border-[#e6cf8c] bg-gradient-to-br from-[#FBF3DC] to-[#F5BE27]/15'
+                  : 'border-[#e8e4df] bg-white hover:border-[#F5BE27]/50'
+              }`}
             >
-              <CardHeader className="p-8 pb-2">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-16 w-16 rounded-full ring-2 ring-[#F5BE27] ring-offset-4 ring-offset-card shrink-0">
-                    <AvatarFallback className="bg-[#F5BE27]/20 text-[#B8860B] text-xl font-semibold">
-                      <AiFillGold className="h-8 w-8" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-semibold text-[#1a1a1a]">{key}</p>
-                    <CardDescription className="text-xs uppercase tracking-wider text-muted-foreground">
-                      {purity}
-                    </CardDescription>
-                  </div>
+              <div className="h-1.5 bg-gradient-to-r from-[#F5BE27] to-[#B8860B]" />
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center rounded-full bg-[#F5BE27]/20 px-3 py-1 text-sm font-bold uppercase text-[#8b6f2a]">
+                    {key}
+                  </span>
+                  <LuCoins className="h-5 w-5 text-[#c9a94a] transition-transform group-hover:scale-110" aria-hidden />
                 </div>
-                <CardTitle className="flex items-center gap-2 flex-wrap text-2xl font-semibold tabular-nums text-card-foreground pt-1">
+
+                <div className="mt-5 flex items-baseline gap-1.5">
                   {price > 0 ? (
                     <>
-                      {price.toFixed(3)}
+                      <span className="text-3xl font-semibold tabular-nums text-[#1a1a1a]">
+                        {price.toFixed(3)}
+                      </span>
                       <span className="sr-only">{data.currency}</span>
-                      <BoldSvg className="w-8 h-auto shrink-0" fill="#F5BE27" />
+                      <BoldSvg className="h-auto w-6 shrink-0" fill="#B8860B" />
                     </>
                   ) : (
-                    '—'
+                    <span className="text-3xl font-semibold text-[#b3a48a]">—</span>
                   )}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-8 pt-0">
-                <p className="text-sm text-muted-foreground">{t('prices.perGram')}</p>
-              </CardContent>
-            </Card>
+                </div>
+
+                <div className="mt-3 flex items-center justify-between border-t border-black/5 pt-3">
+                  <span className="text-xs text-[#8a8178]">{t('prices.perGram')}</span>
+                  <span className="text-xs font-medium text-[#9a8e72]">{t(purityKey)}</span>
+                </div>
+              </div>
+            </div>
           )
         })}
       </div>
+
       {data.updated_at && (
-        <p className="text-xs text-muted-foreground mt-6 text-center">
+        <p className="mt-6 text-center text-xs text-[#9a8e72]">
           {t('prices.updated')} {new Date(data.updated_at).toLocaleString()}
         </p>
       )}
-    </section>
+    </div>
   )
 }

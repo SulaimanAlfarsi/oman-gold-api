@@ -22,6 +22,11 @@ const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
 export const metadata = {
   title: 'Oman Gold API',
   description: 'A simple API for fetching and calculating gold prices in Oman.',
+  icons: {
+    icon: '/gold.svg',
+    shortcut: '/gold.svg',
+    apple: '/gold.svg',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

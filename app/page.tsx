@@ -21,17 +21,6 @@ export default function Home() {
         <AnimatedGoldPath />
 
         <div className="relative z-10 mx-auto w-[calc(100vw-1rem)] min-w-0 max-w-2xl px-0 text-center sm:w-full">
-          {/* Live badge */}
-          <div className="mb-5 flex justify-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#e6dcbf] bg-white/70 px-3.5 py-1.5 text-xs font-medium text-[#8b6f2a] shadow-sm backdrop-blur">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              {t('home.liveBadge')}
-            </span>
-          </div>
-
           <h1 className="px-1 text-3xl font-semibold leading-tight tracking-tight text-[#1a1a1a] sm:text-5xl md:text-6xl lg:text-7xl">
             {t('home.titleLine1')}
             <br />

@@ -222,11 +222,12 @@ html[lang='ar'] body {
 }
 
 .sterling-nav-root .nav-logo-mark {
-  width: 0.68rem;
-  height: 0.68rem;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #f5be27, #b8860b);
-  box-shadow: 0 0 0 4px rgba(245, 190, 39, 0.18);
+  width: 1.5rem;
+  height: 1.1rem;
+  background-image: url('/gold.svg');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
   flex: 0 0 auto;
 }
 
