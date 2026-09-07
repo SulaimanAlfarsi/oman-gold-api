@@ -255,35 +255,62 @@ export function SterlingGateKineticNavigation() {
               <div className="backdrop-layer" />
 
               <div className="ambient-background-shapes" aria-hidden>
+                {/* Home */}
                 <svg className="bg-shape bg-shape-1" viewBox="0 0 400 400" fill="none">
-                  <circle className="shape-element" cx="82" cy="118" r="44" fill="rgba(245,190,39,0.20)" />
-                  <circle className="shape-element" cx="302" cy="82" r="62" fill="rgba(184,134,11,0.16)" />
-                  <circle className="shape-element" cx="202" cy="302" r="84" fill="rgba(26,26,26,0.08)" />
+                  <g className="shape-element">
+                    <g transform="translate(40 40) scale(13.3)" stroke="rgba(184,134,11,0.4)" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+                      <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    </g>
+                  </g>
                 </svg>
+                {/* Prices */}
                 <svg className="bg-shape bg-shape-2" viewBox="0 0 400 400" fill="none">
-                  <path className="shape-element" d="M0 200 Q100 100, 200 200 T400 200" stroke="rgba(245,190,39,0.20)" strokeWidth="60" fill="none" />
-                  <path className="shape-element" d="M0 280 Q100 180, 200 280 T400 280" stroke="rgba(184,134,11,0.16)" strokeWidth="40" fill="none" />
+                  <g className="shape-element">
+                    <g transform="translate(40 40) scale(13.3)" stroke="rgba(184,134,11,0.4)" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M16 7h6v6" />
+                      <path d="m22 7-8.5 8.5-5-5L2 17" />
+                    </g>
+                  </g>
                 </svg>
+                {/* Calculator */}
                 <svg className="bg-shape bg-shape-3" viewBox="0 0 400 400" fill="none">
-                  {Array.from({ length: 12 }).map((_, index) => (
-                    <circle
-                      key={index}
-                      className="shape-element"
-                      cx={70 + (index % 4) * 86}
-                      cy={70 + Math.floor(index / 4) * 112}
-                      r={index % 2 === 0 ? 9 : 13}
-                      fill={index % 3 === 0 ? 'rgba(245,190,39,0.30)' : 'rgba(184,134,11,0.24)'}
-                    />
-                  ))}
+                  <g className="shape-element">
+                    <g transform="translate(40 40) scale(13.3)" stroke="rgba(184,134,11,0.4)" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                      <rect width="16" height="20" x="4" y="2" rx="2" />
+                      <line x1="8" x2="16" y1="6" y2="6" />
+                      <line x1="16" x2="16" y1="14" y2="18" />
+                      <path d="M16 10h.01" />
+                      <path d="M12 10h.01" />
+                      <path d="M8 10h.01" />
+                      <path d="M12 14h.01" />
+                      <path d="M8 14h.01" />
+                      <path d="M12 18h.01" />
+                      <path d="M8 18h.01" />
+                    </g>
+                  </g>
                 </svg>
+                {/* Zakat */}
                 <svg className="bg-shape bg-shape-4" viewBox="0 0 400 400" fill="none">
-                  <path className="shape-element" d="M100 100 Q150 50, 200 100 Q250 150, 200 200 Q150 250, 100 200 Q50 150, 100 100" fill="rgba(245,190,39,0.17)" />
-                  <path className="shape-element" d="M250 200 Q310 150, 360 210 Q385 270, 330 315 Q270 350, 228 298 Q190 250, 250 200" fill="rgba(184,134,11,0.13)" />
+                  <g className="shape-element">
+                    <g transform="translate(40 40) scale(13.3)" stroke="rgba(184,134,11,0.4)" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17" />
+                      <path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9" />
+                      <path d="m2 16 6 6" />
+                      <circle cx="16" cy="9" r="2.9" />
+                      <circle cx="6" cy="5" r="3" />
+                    </g>
+                  </g>
                 </svg>
+                {/* About */}
                 <svg className="bg-shape bg-shape-5" viewBox="0 0 400 400" fill="none">
-                  <line className="shape-element" x1="0" y1="100" x2="300" y2="400" stroke="rgba(245,190,39,0.18)" strokeWidth="30" />
-                  <line className="shape-element" x1="100" y1="0" x2="400" y2="300" stroke="rgba(184,134,11,0.14)" strokeWidth="25" />
-                  <line className="shape-element" x1="210" y1="0" x2="400" y2="190" stroke="rgba(26,26,26,0.09)" strokeWidth="20" />
+                  <g className="shape-element">
+                    <g transform="translate(40 40) scale(13.3)" stroke="rgba(184,134,11,0.4)" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 16v-4" />
+                      <path d="M12 8h.01" />
+                    </g>
+                  </g>
                 </svg>
               </div>
             </div>
